@@ -1,0 +1,10 @@
+This is just a little Java (Android) implementation/port of the UnHosted client
+protocol based on Javascript one and the "My Favourite Sandwich" demo app
+(https://github.com/michiel-unhosted/myfavouritesandwich).
+
+It's far from perfect, but since i have to learn Java for my OOP exams and i
+wanted to learn Android and wanted to collaborate with UnHosted, what's the best
+thing that do the three things at the same time? :-)
+
+At this moment it only have Android Eclipse SDK proyect files with "tunned" UI,
+no more.
