@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" android:orientation="vertical">
+    <TextView android:layout_width="fill_parent"
+            android:layout_height="wrap_content" 
+            android:text="@string/hello"/>
+    <EditText android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/user"></EditText>
+    <Button android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/unlock"
+            android:text="@string/unlock"></Button>
+    <TextView android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:text="@string/hint"
+            android:layout_height="wrap_content"></TextView>
+    <Button android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/create"
+            android:text="@string/createAccount"></Button>
+</LinearLayout>

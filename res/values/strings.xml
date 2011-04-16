@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Login with my unhosted account</string>
+    <string name="app_name">My Favourite Sandwich</string>
+    <string name="hint">hint: try demo@demo.redlibre.org, with password \'demo\'</string>
+    <string name="unlock">Take me in!</string>
+    <string name="createAccount">Create account</string>
+</resources>
