@@ -5,19 +5,22 @@
     <TextView android:layout_width="fill_parent"
             android:layout_height="wrap_content" 
             android:text="@string/hello"/>
-    <EditText android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/user"></EditText>
-    <Button android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+    <EditText android:layout_height="wrap_content"
+            android:id="@+id/user" android:layout_width="match_parent"/>
+    <Button android:layout_height="wrap_content"
             android:id="@+id/unlock"
-            android:text="@string/unlock"></Button>
+            android:text="@string/unlock" android:layout_width="match_parent"
+            android:onClick="unlock_onClick"/>
     <TextView android:id="@+id/textView1"
             android:layout_width="wrap_content"
             android:text="@string/hint"
-            android:layout_height="wrap_content"></TextView>
+            android:layout_height="wrap_content"/>
     <Button android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/create"
-            android:text="@string/createAccount"></Button>
+            android:text="@string/createAccount"
+            android:onClick="create_onClick"/>
+    <TextView android:id="@+id/errorText"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"/>
 </LinearLayout>

@@ -65,7 +65,7 @@ public class WebFinger
 			return false;
 
 		//from 1.0.0 onwards, check if available version is at least minMinorDavVersion
-		if(majorDavVersion)
+		if(majorDavVersion > 0)
 			return davVersion.minor >= minMinorDavVersion;
 
 		//pre-1.0.0, every minor version is breaking, see http://semver.org/

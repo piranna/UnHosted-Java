@@ -22,7 +22,7 @@ public class Unhosted
 		}
 	}
 
-	private DAV dav = new DAV();
+	public DAV dav = new DAV();
 
 	public void setUserName(String userName)
 	{
@@ -63,16 +63,16 @@ public class Unhosted
 			String[] parts = userName.split("@");
 			if(parts.length != 2)
 				//inform the user:
-				throw RegisterException("Please use one '@' symbol in the user name");
+				throw new RegisterException("Please use one '@' symbol in the user name");
 
 			//alert the sys admin about the error through a 404 message to her website:
 			String url = "http://www."+parts[1]+"/unhosted-account-failure/?user="+userName;
 			new DefaultHttpClient().execute(new HttpGet(url));
 
 			//inform the user:
-			throw RegisterException("Unhosted account not found! Please alert" +
-									"an IT hero at " +parts[1]+" about this. " +
-									"For alternative providers, see " +
-									"http://www.unhosted.org/");
+			throw new RegisterException("Unhosted account not found! Please alert" +
+										"an IT hero at " +parts[1]+" about this. " +
+										"For alternative providers, see " +
+										"http://www.unhosted.org/");
 		}
 	}}
