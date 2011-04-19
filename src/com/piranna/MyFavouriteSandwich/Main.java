@@ -1,4 +1,4 @@
-package com.piranna;
+package com.piranna.MyFavouriteSandwich;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -7,6 +7,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import org.unhosted.Unhosted;
+
+import com.piranna.R;
 
 
 public class Main extends Activity
@@ -44,25 +46,25 @@ public class Main extends Activity
     	}
     }
 
-    private loadSandwich()
+    private Sandwich loadSandwich()
     {
-        var sandwich = this.unhosted.dav.get("favSandwich.json");
-        if(sandwich)
+    	Sandwich sandwich = (Sandwich)this.unhosted.dav.get("favSandwich.json");
+        if(sandwich != null)
             return sandwich;
-        return {ingredients:["", ""]};
+        return new Sandwich(new String[]{"", ""});
     }
 
-    private void saveSandwich(ingredients)
+    private void saveSandwich(Sandwich sandwich)
     {
-        this.unhosted.dav.put("favSandwich.json", {"ingredients":ingredients});
+        this.unhosted.dav.put("favSandwich.json", sandwich);
     }
 
     private void show()
     {
         String userName = this.unhosted.getUserName();
-        if(userName)
+        if(userName != null)
         {
-            var sandwich = loadSandwich();
+            Sandwich sandwich = loadSandwich();
 //            showCurrentUser(userName);
 //            showCurrentSandwich(sandwich);
             showUnlocked();

@@ -3,20 +3,30 @@
  */
 package org.unhosted;
 
+import java.net.URL;
+
+import org.unhosted.html5.Storage;
+
+
 /**
  * @author piranna
  *
  */
 public class OAuth
 {
-	public OAuth()
+	private Storage localStorage;
+	private URL location;
+
+	public OAuth(Storage localStorage)
 	{
+		this.localStorage = localStorage;
+
 		this.receiveToken();
 	}
 
 	public void dance(String oAuthDomain, String userName, String app)
 	{
-		window.location = oAuthDomain
+		this.location = oAuthDomain
 		+"oauth2/auth"
 		+"?client_id="+app
 		+"&redirect_uri="+app
@@ -27,7 +37,7 @@ public class OAuth
 
 	public void revoke()
 	{
-		localStorage.removeItem("OAuth2-cs::token");
+		this.localStorage.removeItem("OAuth2-cs::token");
 	}
 
 	public void receiveToken()
@@ -36,8 +46,8 @@ public class OAuth
 		var results = regex.exec(window.location.href);
 		if(results)
 		{
-			localStorage.setItem("OAuth2-cs::token", results[1]);
-			window.location = location.href.split("?")[0];
+			this.localStorage.setItem("OAuth2-cs::token", results[1]);
+			this.location = URL(this.location.toString().split("?")[0]);
 		}
 	}
 }

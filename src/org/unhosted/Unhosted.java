@@ -3,9 +3,13 @@
  */
 package org.unhosted;
 
+import java.net.URL;
+
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+
+import org.unhosted.html5.Storage;
 
 
 /**
@@ -24,30 +28,39 @@ public class Unhosted
 
 	public DAV dav = new DAV();
 
+	private Storage localStorage;
+	private URL location;
+
+	public Unhosted(Storage localStorage)
+	{
+		this.localStorage = localStorage;
+	}
+
 	public void setUserName(String userName)
 	{
 		if(userName != "")
 		{
-			localStorage.setItem("unhosted::userName", userName);
+			this.localStorage.setItem("unhosted::userName", userName);
 			String davDomain = WebFinger.getDavDomain(userName, 0, 1);
 			if(davDomain != "")
 			{
-				localStorage.setItem("unhosted::davDomain", davDomain);
-				OAuth.dance(davDomain, userName, location.host + location.pathname);
+				this.localStorage.setItem("unhosted::davDomain", davDomain);
+				OAuth.dance(davDomain, userName,
+							this.location.getHost() + this.location.getPath());
 			}
 		}
 		else
 		{
-			localStorage.removeItem("unhosted::userName");
-			localStorage.removeItem("unhosted::davDomain");
+			this.localStorage.removeItem("unhosted::userName");
+			this.localStorage.removeItem("unhosted::davDomain");
 			OAuth.revoke();
 		}
 	}
 
 	public String getUserName()
 	{
-		if(localStorage.getItem("OAuth2-cs::token"))
-			return localStorage.getItem("unhosted::userName").trim();
+		if(this.localStorage.getItem("OAuth2-cs::token") != null)
+			return ((String)this.localStorage.getItem("unhosted::userName")).trim();
 		return null;
 	}
 
@@ -55,7 +68,7 @@ public class Unhosted
 	{
 		String registerUrl = WebFinger.getAdminUrl(userName);
 		if(registerUrl != "")
-			window.location = registerUrl;
+			this.location = URL(registerUrl);
 
 		// Error while registration
 		else

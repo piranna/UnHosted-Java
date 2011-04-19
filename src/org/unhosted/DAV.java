@@ -33,12 +33,12 @@ public class DAV
 		return url;
 	}
 
-	public get(String key)
+	public Object get(String key)
 	{
 		JSONObject text = new JSONObject(value);
 	}
 
-	public put(String key, Object value)
+	public void put(String key, Object value)
 	{
 		JSONObject text = new JSONObject(value);
 	}
