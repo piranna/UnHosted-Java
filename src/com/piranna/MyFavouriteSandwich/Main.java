@@ -53,7 +53,7 @@ public class Main extends Activity
 
     private Sandwich loadSandwich()
     {
-    	Sandwich sandwich;
+    	Sandwich sandwich = null;
     	try
     	{
         	sandwich = (Sandwich)this.unhosted.dav.get("favSandwich.json");

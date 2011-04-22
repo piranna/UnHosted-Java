@@ -6,6 +6,9 @@ package org.unhosted;
 import java.io.InputStream;
 import java.io.IOException;
 import java.net.URL;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -14,6 +17,12 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.impl.client.DefaultHttpClient;
+
+import org.xml.sax.SAXException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.NodeList;
 
 
 /**
@@ -43,31 +52,88 @@ public class WebFinger
 
 		// Create client and execute
 		DefaultHttpClient client = new DefaultHttpClient();
-		HttpResponse response = client.execute(http);
+		HttpResponse response = null;
+		try
+		{
+			response = client.execute(http);
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
 
 		// Check response
-		StatusLine statusLine = response.getStatusLine();
-		int code = statusLine.getStatusCode();
-		if(code == 200)
+		if(response != null)
 		{
-			InputStream is = response.getEntity().getContent();
-
-			var links = is.documentElement.getElementsByTagName("Link");
-			for(int i=0; i<links.length; i++)
+			StatusLine statusLine = response.getStatusLine();
+			int code = statusLine.getStatusCode();
+			if(code == 200)
 			{
-				attributes = links[i].attributes;
-				if(attributes.getNamedItem("rel").value == linkRel)
-					return attributes.getNamedItem("template").value;
+				HttpEntity entity = response.getEntity();
+				InputStream is = null;
+				try
+				{
+					is = entity.getContent();
+				}
+				catch(IOException e)
+				{
+					e.printStackTrace();
+				}
+
+				DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+				DocumentBuilder documentBuilder = null;
+				try
+				{
+					documentBuilder = dbf.newDocumentBuilder();
+				}
+				catch(ParserConfigurationException e)
+				{
+					e.printStackTrace();
+				}
+
+				if(documentBuilder != null)
+				{
+					Document doc = null;
+					try
+					{
+						doc = documentBuilder.parse(is);
+					}
+					catch(IOException e)
+					{
+						e.printStackTrace();
+					}
+					catch(SAXException e)
+					{
+						e.printStackTrace();
+					}
+
+					if(doc != null)
+					{
+						NodeList links = doc.getElementsByTagName("Link");
+						for(int i=0; i<links.getLength(); i++)
+						{
+							NamedNodeMap attributes = links.item(i).getAttributes();
+							if(attributes.getNamedItem("rel").getNodeValue() == linkRel)
+								return attributes.getNamedItem("template").getNodeValue();
+						}
+					}
+				}
 			}
 		}
+
+		return null;
 	}
 
 	static private boolean matchLinkRel(String linkRel, int majorDavVersion,
 										int minMinorDavVersion)
 	{
 		//TODO: do some real reg exp...
-		Object davVersion = new Object(){final int major = 0;
-										final int minor = 1;};
+		final class davVersion
+		{
+			static final int major = 0;
+			static final int minor = 1;
+		};
 
 		if(davVersion.major != majorDavVersion)
 			return false;
@@ -94,7 +160,7 @@ public class WebFinger
 			HttpClient httpclient = new DefaultHttpClient();
 			HttpGet httpget = new HttpGet(url);
 
-			HttpEntity entity;
+			HttpEntity entity = null;
 			try
 			{
 				// Execute the request
@@ -121,15 +187,58 @@ public class WebFinger
 //				xhr.overrideMimeType("text/xml");
 
 				// Read response
-				InputStream is = entity.getContent();
-
-				var links = is.documentElement.getElementsByTagName("Link");
-				for(int i=0; i < links.length; i++)
+				InputStream is = null;
+				try
 				{
-					attributes = links[i].attributes;
-					if(matchLinkRel(attributes.getNamedItem("rel").value,
-									majorVersion, minMinorVersion))
-						return attributes.getNamedItem("href").value;
+					is = entity.getContent();
+				}
+				catch(IOException e)
+				{
+					e.printStackTrace();
+				}
+
+				if(is != null)
+				{
+					DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+					DocumentBuilder documentBuilder = null;
+					try
+					{
+						documentBuilder = dbf.newDocumentBuilder();
+					}
+					catch(ParserConfigurationException e)
+					{
+						e.printStackTrace();
+					}
+
+					if(documentBuilder != null)
+					{
+						Document doc = null;
+						try
+						{
+							doc = documentBuilder.parse(is);
+						}
+						catch(IOException e)
+						{
+							e.printStackTrace();
+						}
+						catch(SAXException e)
+						{
+							e.printStackTrace();
+						}
+
+						if(doc != null)
+						{
+							NodeList links = doc.getElementsByTagName("Link");
+							for(int i=0; i<links.getLength(); i++)
+							{
+								NamedNodeMap attributes = links.item(i).getAttributes();
+								if(matchLinkRel(attributes.getNamedItem("rel").getNodeValue(),
+												majorVersion, minMinorVersion))
+									return attributes.getNamedItem("href").getNodeValue();
+							}
+						}
+					}
 				}
 			}
 		}
