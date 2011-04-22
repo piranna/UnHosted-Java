@@ -3,8 +3,10 @@
  */
 package org.unhosted;
 
-import java.net.URL;
+import java.io.IOException;
+import java.net.*;
 
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -28,12 +30,17 @@ public class Unhosted
 
 	public DAV dav = new DAV();
 
+	private OAuth oAuth;
+	private WebFinger webFinger = new WebFinger();
+
 	private Storage localStorage;
 	private URL location;
 
 	public Unhosted(Storage localStorage)
 	{
 		this.localStorage = localStorage;
+
+		this.oAuth = new OAuth(localStorage);
 	}
 
 	public void setUserName(String userName)
@@ -41,11 +48,11 @@ public class Unhosted
 		if(userName != "")
 		{
 			this.localStorage.setItem("unhosted::userName", userName);
-			String davDomain = WebFinger.getDavDomain(userName, 0, 1);
+			String davDomain = this.webFinger.getDavDomain(userName, 0, 1);
 			if(davDomain != "")
 			{
 				this.localStorage.setItem("unhosted::davDomain", davDomain);
-				OAuth.dance(davDomain, userName,
+				this.oAuth.dance(davDomain, userName,
 							this.location.getHost() + this.location.getPath());
 			}
 		}
@@ -53,7 +60,7 @@ public class Unhosted
 		{
 			this.localStorage.removeItem("unhosted::userName");
 			this.localStorage.removeItem("unhosted::davDomain");
-			OAuth.revoke();
+			this.oAuth.revoke();
 		}
 	}
 
@@ -64,28 +71,55 @@ public class Unhosted
 		return null;
 	}
 
-	public void register(String userName)
+	public void register(String userName) throws RegisterException
 	{
-		String registerUrl = WebFinger.getAdminUrl(userName);
+		String registerUrl = this.webFinger.getAdminUrl(userName);
 		if(registerUrl != "")
-			this.location = URL(registerUrl);
+			try
+			{
+				this.location = new URL(registerUrl);
+			}
+			catch(MalformedURLException e)
+			{
+				e.printStackTrace();
+			}
 
 		// Error while registration
 		else
 		{
 			String[] parts = userName.split("@");
-			if(parts.length != 2)
-				//inform the user:
-				throw new RegisterException("Please use one '@' symbol in the user name");
 
 			//alert the sys admin about the error through a 404 message to her website:
-			String url = "http://www."+parts[1]+"/unhosted-account-failure/?user="+userName;
-			new DefaultHttpClient().execute(new HttpGet(url));
+			if(parts.length == 2)
+			{
+				String url = "http://www."+parts[1]+"/unhosted-account-failure/?user="+userName;
+
+				// Prepare a request object
+				HttpClient httpclient = new DefaultHttpClient();
+				HttpGet httpget = new HttpGet(url);
+
+				// Execute the request and get hold of the response entity
+				try
+				{
+					httpclient.execute(httpget).getEntity();
+				}
+				catch(ClientProtocolException e)
+				{
+					e.printStackTrace();
+				}
+				catch(IOException e)
+				{
+					e.printStackTrace();
+				}
+
+				//inform the user:
+				throw new RegisterException("Unhosted account not found! Please alert" +
+											"an IT hero at " +parts[1]+" about this. " +
+											"For alternative providers, see " +
+											"http://www.unhosted.org/");
+			}
 
 			//inform the user:
-			throw new RegisterException("Unhosted account not found! Please alert" +
-										"an IT hero at " +parts[1]+" about this. " +
-										"For alternative providers, see " +
-										"http://www.unhosted.org/");
+			throw new RegisterException("Please use one '@' symbol in the user name");
 		}
 	}}

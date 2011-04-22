@@ -11,7 +11,7 @@ package org.unhosted.html5;
  */
 public interface Storage
 {
-	public long length = 0;
+//	public long length = 0;
 
 	public String key(long index);
 

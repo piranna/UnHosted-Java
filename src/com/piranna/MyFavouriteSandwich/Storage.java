@@ -3,8 +3,8 @@
  */
 package com.piranna.MyFavouriteSandwich;
 
+import android.content.Context;
 import android.content.SharedPreferences;
-import android.context.Context.*;
 
 
 /**
@@ -14,10 +14,17 @@ import android.context.Context.*;
 public class Storage implements org.unhosted.html5.Storage
 {
 	private SharedPreferences settings;
+	private SharedPreferences.Editor editor;
 
-	public Storage(String file)
+	public Storage(Context context, String file)
 	{
-		this.settings = getSharedPreferences(file, MODE_PRIVATE);
+		this.settings = context.getSharedPreferences(file, Context.MODE_PRIVATE);
+		this.editor = this.settings.edit();
+	}
+
+	public long length()
+	{
+		return this.settings.getAll().size();
 	}
 
 	/* (non-Javadoc)
@@ -26,9 +33,8 @@ public class Storage implements org.unhosted.html5.Storage
 	@Override
 	public void clear()
 	{
-		SharedPreferences.Editor editor = this.settings.edit();
-		editor.clear();
-		editor.apply();
+		this.editor.clear();
+		this.editor.apply();
 	}
 
 	/* (non-Javadoc)
@@ -46,7 +52,7 @@ public class Storage implements org.unhosted.html5.Storage
 	@Override
 	public String key(long index)
 	{
-		return this.settings.getAll()[index];
+		return (String)this.settings.getAll().keySet().toArray()[(int)index];
 	}
 
 	/* (non-Javadoc)
@@ -55,9 +61,8 @@ public class Storage implements org.unhosted.html5.Storage
 	@Override
 	public void removeItem(String key)
 	{
-		SharedPreferences.Editor editor = this.settings.edit();
-		editor.remove(key);
-		editor.apply();
+		this.editor.remove(key);
+		this.editor.apply();
 	}
 
 	/* (non-Javadoc)
@@ -66,8 +71,7 @@ public class Storage implements org.unhosted.html5.Storage
 	@Override
 	public void setItem(String key, Object value)
 	{
-		SharedPreferences.Editor editor = this.settings.edit();
-		editor.putObject(key, value);
-		editor.apply();
+		this.editor.putString(key, (String)value);
+		this.editor.apply();
 	}
 }

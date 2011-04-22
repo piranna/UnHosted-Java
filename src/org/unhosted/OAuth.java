@@ -3,7 +3,8 @@
  */
 package org.unhosted;
 
-import java.net.URL;
+import java.net.*;
+import java.util.regex.*;
 
 import org.unhosted.html5.Storage;
 
@@ -26,13 +27,17 @@ public class OAuth
 
 	public void dance(String oAuthDomain, String userName, String app)
 	{
-		this.location = oAuthDomain
-		+"oauth2/auth"
-		+"?client_id="+app
-		+"&redirect_uri="+app
-		+"&response_type=token"
-		+"&scope="+document.domain
-		+"&user_name="+userName;
+		try
+		{
+			this.location = new URL(oAuthDomain+"oauth2/auth?response_type=token"
+					+"&scope="+this.location.getAuthority()
+					+"&user_name="+userName
+					+"&client_id="+app+"&redirect_uri="+app);
+		}
+		catch(MalformedURLException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	public void revoke()
@@ -42,12 +47,17 @@ public class OAuth
 
 	public void receiveToken()
 	{
-		var regex = new RegExp("[\\?&]token=([^&#]*)");
-		var results = regex.exec(window.location.href);
-		if(results)
+		Pattern pattern = Pattern.compile("[\\?&]token=([^&#]*)");
+		Matcher matcher = pattern.matcher(this.location.toString());
+		if(matcher.find())
 		{
-			this.localStorage.setItem("OAuth2-cs::token", results[1]);
-			this.location = URL(this.location.toString().split("?")[0]);
+			this.localStorage.setItem("OAuth2-cs::token", matcher.group(1));
+
+			try
+			{
+				this.location = new URL(this.location.toString().split("?")[0]);
+			}
+			catch(MalformedURLException e){};
 		}
 	}
 }

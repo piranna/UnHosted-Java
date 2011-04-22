@@ -1,19 +1,24 @@
 package com.piranna.MyFavouriteSandwich;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.unhosted.DAV;
 import org.unhosted.Unhosted;
 
-import com.piranna.R;
+import com.piranna.MyFavouriteSandwich.R;
+import com.piranna.MyFavouriteSandwich.Storage;
 
 
 public class Main extends Activity
 {
-	Unhosted unhosted = new Unhosted();
+	Unhosted unhosted = new Unhosted(new Storage(this,
+												"com.piranna.MyFavouriteSandwich.Storage"));
 
 	/** Called when the activity is first created. */
     @Override
@@ -48,15 +53,31 @@ public class Main extends Activity
 
     private Sandwich loadSandwich()
     {
-    	Sandwich sandwich = (Sandwich)this.unhosted.dav.get("favSandwich.json");
-        if(sandwich != null)
+    	Sandwich sandwich;
+    	try
+    	{
+        	sandwich = (Sandwich)this.unhosted.dav.get("favSandwich.json");
+    	}
+    	catch(DAV.DAVException e)
+		{
+			e.printStackTrace();
+		}
+
+    	if(sandwich != null)
             return sandwich;
         return new Sandwich(new String[]{"", ""});
     }
 
     private void saveSandwich(Sandwich sandwich)
     {
-        this.unhosted.dav.put("favSandwich.json", sandwich);
+    	try
+    	{
+            this.unhosted.dav.put("favSandwich.json", sandwich);
+    	}
+    	catch(DAV.DAVException e)
+		{
+			e.printStackTrace();
+		}
     }
 
     private void show()
