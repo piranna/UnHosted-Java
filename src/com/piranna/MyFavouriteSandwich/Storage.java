@@ -34,7 +34,8 @@ public class Storage implements org.unhosted.html5.Storage
 	public void clear()
 	{
 		this.editor.clear();
-		this.editor.apply();
+		this.editor.commit();
+//		this.editor.apply();
 	}
 
 	/* (non-Javadoc)
@@ -62,7 +63,8 @@ public class Storage implements org.unhosted.html5.Storage
 	public void removeItem(String key)
 	{
 		this.editor.remove(key);
-		this.editor.apply();
+		this.editor.commit();
+//		this.editor.apply();
 	}
 
 	/* (non-Javadoc)
@@ -72,6 +74,7 @@ public class Storage implements org.unhosted.html5.Storage
 	public void setItem(String key, Object value)
 	{
 		this.editor.putString(key, (String)value);
-		this.editor.apply();
+		this.editor.commit();
+//		this.editor.apply();
 	}
 }

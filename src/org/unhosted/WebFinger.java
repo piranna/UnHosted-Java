@@ -40,7 +40,6 @@ public class WebFinger
 		if(parts.length != 2)
 			return null;
 
-		String user = parts[0];
 		String domain = parts[1];
 
 		//get the host-meta data for the domain:

@@ -1,9 +1,10 @@
 package com.piranna.MyFavouriteSandwich;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -11,14 +12,11 @@ import android.widget.TextView;
 import org.unhosted.DAV;
 import org.unhosted.Unhosted;
 
-import com.piranna.MyFavouriteSandwich.R;
-import com.piranna.MyFavouriteSandwich.Storage;
-
 
 public class Main extends Activity
 {
 	Unhosted unhosted = new Unhosted(new Storage(this,
-												"com.piranna.MyFavouriteSandwich.Storage"));
+									"com.piranna.MyFavouriteSandwich.Storage"));
 
 	/** Called when the activity is first created. */
     @Override
@@ -26,31 +24,44 @@ public class Main extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+
+        String userName = this.unhosted.getUserName();
+        if(userName != null)
+        {
+            this.showCurrentUser(userName);
+            this.showCurrentSandwich(loadSandwich());
+        }
     }
 
-    // Events
-    public void unlock_onClick(View view)
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
     {
-    	final EditText user = (EditText)findViewById(R.id.user);
-    	this.unhosted.setUserName(user.getText().toString());
-    	this.show();
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
     }
 
-    public void create_onClick(View view)
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
     {
-    	final EditText user = (EditText)findViewById(R.id.user);
-    	final TextView errorText = (TextView)findViewById(R.id.errorText);
+        // Handle item selection
+        switch(item.getItemId())
+        {
+	        case R.id.saveSandwich:
+	            this.saveSandwich();
+	            return true;
 
-    	try
-    	{
-    		this.unhosted.register(user.getText().toString());
-    	}
-    	catch(Unhosted.RegisterException e)
-    	{
-        	errorText.setText(e.getMessage());
-    	}
+	        case R.id.lock:
+	            this.Lock();
+	            return true;
+
+	        default:
+	            return super.onOptionsItemSelected(item);
+        }
     }
 
+
+    // Data access
     private Sandwich loadSandwich()
     {
     	Sandwich sandwich = null;
@@ -80,17 +91,26 @@ public class Main extends Activity
 		}
     }
 
-    private void show()
+
+    // Presentation
+    private void showCurrentUser(String userName)
     {
-        String userName = this.unhosted.getUserName();
-        if(userName != null)
-        {
-            Sandwich sandwich = loadSandwich();
-//            showCurrentUser(userName);
-//            showCurrentSandwich(sandwich);
-            showUnlocked();
-        }
-        else
-            showLocked();
+    	document.getElementById("currentUser").innerHTML=
+    		"Current user is <strong>"+userName+"</strong> " +
+    		"[<a onclick='localStorage.removeItem(\'OAuth2-cs::token\');show();'>Lock</a>]";
+    }
+
+    private void showCurrentSandwich(Sandwich sandwich)
+    {
+    	document.getElementById("firstIngredient").value = sandwich.ingredients[0];
+    	document.getElementById("secondIngredient").value = sandwich.ingredients[1];
+    }
+
+
+    // Private
+    private void Lock()
+    {
+    	document.getElementById("unlockedView").style.display="none";
+    	document.getElementById("lockedView").style.display="block";
     }
 }
