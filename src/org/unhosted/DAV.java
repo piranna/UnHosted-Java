@@ -12,7 +12,6 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 //import java.io.Writer;
 
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
@@ -150,10 +149,6 @@ public class DAV
 			try
 			{
 				response = client.execute(http);
-			}
-			catch(ClientProtocolException e)
-			{
-				e.printStackTrace();
 			}
 			catch(IOException e)
 			{

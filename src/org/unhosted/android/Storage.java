@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.piranna.MyFavouriteSandwich;
+package org.unhosted.android;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -11,7 +11,7 @@ import android.content.SharedPreferences;
  * @author piranna
  *
  */
-public class Storage implements org.unhosted.html5.Storage
+public class Storage implements org.unhosted.IStorage
 {
 	private SharedPreferences settings;
 	private SharedPreferences.Editor editor;

@@ -2,14 +2,14 @@
  * Interface that mimics the HTML5 Storage functionality
  * http://www.w3.org/TR/webstorage/#storage-0
  */
-package org.unhosted.html5;
+package org.unhosted;
 
 
 /**
  * @author piranna
  *
  */
-public interface Storage
+public interface IStorage
 {
 //	public long length = 0;
 

@@ -1,6 +1,7 @@
 package com.piranna.MyFavouriteSandwich;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -8,8 +9,9 @@ import android.view.MenuInflater;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import org.unhosted.DAV;
 import org.unhosted.Unhosted;
+import org.unhosted.android.Storage;
+import org.unhosted.DAV.DAVException;
 
 
 public class Main extends Activity
@@ -23,10 +25,27 @@ public class Main extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        this.unhosted = new Unhosted(new Storage(this,
+        this.unhosted = new Unhosted("http://www.myfavouritesandwich.org/",
+        							new Storage(this,
 											"com.piranna.MyFavouriteSandwich"));
 
-        this.showCurrentUser(this.unhosted.getUserName());
+        String userName = null;
+//        do
+//        {
+        	// Get user name
+        	userName = this.unhosted.getUserName();
+
+        	// User is not logged, show login dialog
+        	if(userName == null)
+        	{
+        		Dialog dialog = new Dialog(this.getApplicationContext());
+
+        		dialog.setContentView(R.layout.login);
+        		dialog.setTitle("UnHosted login");
+        	}
+//        }while(userName == null);
+
+        this.showCurrentUser(userName);
         this.showCurrentSandwich(loadSandwich());
     }
 
@@ -66,7 +85,7 @@ public class Main extends Activity
     	{
         	sandwich = (Sandwich)this.unhosted.dav.get("favSandwich.json");
     	}
-    	catch(DAV.DAVException e)
+    	catch(DAVException e)
 		{
 			e.printStackTrace();
 		}
@@ -82,7 +101,7 @@ public class Main extends Activity
     	{
             this.unhosted.dav.put("favSandwich.json", sandwich);
     	}
-    	catch(DAV.DAVException e)
+    	catch(DAVException e)
 		{
 			e.printStackTrace();
 		}

@@ -6,12 +6,10 @@ package org.unhosted;
 import java.io.IOException;
 import java.net.*;
 
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import org.unhosted.html5.Storage;
 
 
 /**
@@ -24,7 +22,7 @@ public class Unhosted
 	final private String namespace = "unhosted";
 
 	// Attributes
-	private Storage localStorage;
+	private IStorage localStorage;
 	private URL location;
 
 	private OAuth oAuth;
@@ -45,11 +43,20 @@ public class Unhosted
 
 
 	// Constructor
-	public Unhosted(Storage localStorage)
+	public Unhosted(String url, IStorage localStorage)
 	{
+		try
+		{
+			this.location = new URL(url);
+		}
+		catch(MalformedURLException e)
+		{
+			e.printStackTrace();
+		}
+
 		this.localStorage = localStorage;
 
-		this.oAuth = new OAuth(localStorage);
+		this.oAuth = new OAuth(this);
 
 		this.dav = new DAV(this);
 	}
@@ -126,10 +133,6 @@ public class Unhosted
 				{
 					httpclient.execute(httpget).getEntity();
 				}
-				catch(ClientProtocolException e)
-				{
-					e.printStackTrace();
-				}
 				catch(IOException e)
 				{
 					e.printStackTrace();
@@ -162,5 +165,20 @@ public class Unhosted
 	public String getOAuthToken()
 	{
 		return this.oAuth.getToken();
+	}
+
+	public IStorage getLocalStorage()
+	{
+		return this.localStorage;
+	}
+
+	public void setLocation(URL location)
+	{
+		this.location = location;
+	}
+
+	public String getLocation()
+	{
+		return this.location.toString();
 	}
 }

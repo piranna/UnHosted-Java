@@ -10,7 +10,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.HttpEntity;
@@ -167,10 +166,6 @@ public class WebFinger
 
 				// Get hold of the response entity
 				entity = response.getEntity();
-			}
-			catch(ClientProtocolException e)
-			{
-				e.printStackTrace();
 			}
 			catch(IOException e)
 			{

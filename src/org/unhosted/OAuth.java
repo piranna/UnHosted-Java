@@ -6,8 +6,6 @@ package org.unhosted;
 import java.net.*;
 import java.util.regex.*;
 
-import org.unhosted.html5.Storage;
-
 
 /**
  * @author piranna
@@ -19,13 +17,12 @@ public class OAuth
 	final private String namespace = "OAuth2-cs";
 
 	// Attributes
-	private Storage localStorage;
-	private URL location;
+	private Unhosted unhosted;
 
 	// Constructor
-	public OAuth(Storage localStorage)
+	public OAuth(Unhosted unhosted)
 	{
-		this.localStorage = localStorage;
+		this.unhosted = unhosted;
 
 		this.receiveToken();
 	}
@@ -34,23 +31,25 @@ public class OAuth
 	throws MalformedURLException
 	{
 		return new URL(oAuthDomain+"oauth2/auth?response_type=token"
-				+"&scope="+this.location.getAuthority()
+				+"&scope="+this.unhosted.getLocationAuthority()
 				+"&user_name="+userName
 				+"&client_id="+app+"&redirect_uri="+app);
 	}
 
 	// Token
-	public void receiveToken()
+	private void receiveToken()
 	{
+		String location = this.unhosted.getLocation();
+
 		Pattern pattern = Pattern.compile("[\\?&]token=([^&#]*)");
-		Matcher matcher = pattern.matcher(this.location.toString());
+		Matcher matcher = pattern.matcher(location);
 		if(matcher.find())
 		{
-			this.localStorage.setItem(this.namespace+"::token", matcher.group(1));
+			this.unhosted.getLocalStorage().setItem(this.namespace+"::token", matcher.group(1));
 
 			try
 			{
-				this.location = new URL(this.location.toString().split("?")[0]);
+				this.unhosted.setLocation(new URL(location.split("?")[0]));
 			}
 			catch(MalformedURLException e)
 			{
@@ -61,11 +60,11 @@ public class OAuth
 
 	public String getToken()
 	{
-		return (String)this.localStorage.getItem(this.namespace+"::token");
+		return (String)this.unhosted.getLocalStorage().getItem(this.namespace+"::token");
 	}
 
 	public void revokeToken()
 	{
-		this.localStorage.removeItem(this.namespace+"::token");
+		this.unhosted.getLocalStorage().removeItem(this.namespace+"::token");
 	}
 }
