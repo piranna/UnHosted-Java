@@ -20,6 +20,21 @@ import org.unhosted.html5.Storage;
  */
 public class Unhosted
 {
+	// Storage namespace
+	final private String namespace = "unhosted";
+
+	// Attributes
+	private Storage localStorage;
+	private URL location;
+
+	private OAuth oAuth;
+	private WebFinger webFinger = new WebFinger();
+
+	// UnHosted modules - only DAV at this moment
+	public DAV dav;
+
+
+	// Errors exception
 	public class RegisterException extends Exception
 	{
 		public RegisterException(String s)
@@ -28,47 +43,55 @@ public class Unhosted
 		}
 	}
 
-	public DAV dav = new DAV();
 
-	private OAuth oAuth;
-	private WebFinger webFinger = new WebFinger();
-
-	private Storage localStorage;
-	private URL location;
-
+	// Constructor
 	public Unhosted(Storage localStorage)
 	{
 		this.localStorage = localStorage;
 
 		this.oAuth = new OAuth(localStorage);
+
+		this.dav = new DAV(this);
+	}
+
+	// User name
+	public String getUserName()
+	{
+		if(this.oAuth.getToken() != null)
+			return ((String)this.localStorage.getItem(this.namespace+"::userName")).trim();
+		return null;
 	}
 
 	public void setUserName(String userName)
 	{
-		if(userName != "")
+		if(userName == null)
 		{
-			this.localStorage.setItem("unhosted::userName", userName);
-			String davDomain = this.webFinger.getDavDomain(userName, 0, 1);
-			if(davDomain != "")
-			{
-				this.localStorage.setItem("unhosted::davDomain", davDomain);
-				this.oAuth.dance(davDomain, userName,
-							this.location.getHost() + this.location.getPath());
-			}
+			this.localStorage.removeItem(this.namespace+"::userName");
+			this.localStorage.removeItem(this.namespace+"::davDomain");
+
+			this.oAuth.revokeToken();
 		}
 		else
 		{
-			this.localStorage.removeItem("unhosted::userName");
-			this.localStorage.removeItem("unhosted::davDomain");
-			this.oAuth.revoke();
-		}
-	}
+			this.localStorage.setItem(this.namespace+"::userName", userName);
 
-	public String getUserName()
-	{
-		if(this.localStorage.getItem("OAuth2-cs::token") != null)
-			return ((String)this.localStorage.getItem("unhosted::userName")).trim();
-		return null;
+			String davDomain = this.webFinger.getDavDomain(userName, 0, 1);
+			if(davDomain != null)
+			{
+				this.localStorage.setItem(this.namespace+"::davDomain", davDomain);
+
+				try
+				{
+					this.location = this.oAuth.dance(davDomain, userName,
+													this.location.getHost() +
+													this.location.getPath());
+				}
+				catch(MalformedURLException e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 	public void register(String userName) throws RegisterException
@@ -122,4 +145,22 @@ public class Unhosted
 			//inform the user:
 			throw new RegisterException("Please use one '@' symbol in the user name");
 		}
-	}}
+	}
+
+
+	// Auxiliars
+	public String getDavDomain()
+	{
+		return (String)this.localStorage.getItem(this.namespace+"::davDomain");
+	}
+
+	public String getLocationAuthority()
+	{
+		return this.location.getAuthority();
+	}
+
+	public String getOAuthToken()
+	{
+		return this.oAuth.getToken();
+	}
+}

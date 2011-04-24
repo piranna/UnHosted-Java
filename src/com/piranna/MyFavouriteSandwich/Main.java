@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuInflater;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -15,8 +14,7 @@ import org.unhosted.Unhosted;
 
 public class Main extends Activity
 {
-	Unhosted unhosted = new Unhosted(new Storage(this,
-									"com.piranna.MyFavouriteSandwich.Storage"));
+	private Unhosted unhosted;
 
 	/** Called when the activity is first created. */
     @Override
@@ -25,12 +23,11 @@ public class Main extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        String userName = this.unhosted.getUserName();
-        if(userName != null)
-        {
-            this.showCurrentUser(userName);
-            this.showCurrentSandwich(loadSandwich());
-        }
+        this.unhosted = new Unhosted(new Storage(this,
+											"com.piranna.MyFavouriteSandwich"));
+
+        this.showCurrentUser(this.unhosted.getUserName());
+        this.showCurrentSandwich(loadSandwich());
     }
 
     @Override
@@ -61,7 +58,7 @@ public class Main extends Activity
     }
 
 
-    // Data access
+	// Data access
     private Sandwich loadSandwich()
     {
     	Sandwich sandwich = null;
@@ -95,22 +92,31 @@ public class Main extends Activity
     // Presentation
     private void showCurrentUser(String userName)
     {
-    	document.getElementById("currentUser").innerHTML=
-    		"Current user is <strong>"+userName+"</strong> " +
-    		"[<a onclick='localStorage.removeItem(\'OAuth2-cs::token\');show();'>Lock</a>]";
+    	((TextView)findViewById(R.id.currentUser)).setText("Current user is <strong>"+userName+"</strong>");
     }
 
     private void showCurrentSandwich(Sandwich sandwich)
     {
-    	document.getElementById("firstIngredient").value = sandwich.ingredients[0];
-    	document.getElementById("secondIngredient").value = sandwich.ingredients[1];
+    	((EditText)findViewById(R.id.ingredient1)).setText(sandwich.ingredients[0]);
+    	((EditText)findViewById(R.id.ingredient2)).setText(sandwich.ingredients[1]);
     }
 
 
     // Private
+    private void saveSandwich()
+    {
+    	// Get ingredients
+    	String ingredient1 = ((EditText)findViewById(R.id.ingredient1)).getText().toString();
+    	String ingredient2 = ((EditText)findViewById(R.id.ingredient2)).getText().toString();
+
+    	// Save sandwich
+		this.saveSandwich(new Sandwich(new String[]{ingredient1, ingredient2}));
+	}
+
     private void Lock()
     {
-    	document.getElementById("unlockedView").style.display="none";
-    	document.getElementById("lockedView").style.display="block";
+    	this.unhosted.setUserName(null);
+
+    	this.finish();
     }
 }

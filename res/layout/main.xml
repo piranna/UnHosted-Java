@@ -14,12 +14,10 @@
             android:src="@drawable/bun_up"/>
     <EditText
             android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:id="@+id/editText1"/>
+            android:layout_width="match_parent" android:id="@+id/ingredient1"/>
     <EditText
             android:layout_width="match_parent"
-            android:id="@+id/editText2"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" android:id="@+id/ingredient2"/>
     <ImageView
             android:id="@+id/imageView2"
             android:layout_width="wrap_content"

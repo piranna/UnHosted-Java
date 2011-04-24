@@ -11,7 +11,6 @@ import java.io.Reader;
 //import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 //import java.io.Writer;
-import java.net.URL;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
@@ -25,8 +24,6 @@ import android.util.Base64;	// API Level 8
 
 import com.google.gson.Gson;
 
-import org.unhosted.html5.Storage;
-
 
 /**
  * @author piranna
@@ -34,6 +31,10 @@ import org.unhosted.html5.Storage;
  */
 public class DAV
 {
+	// Attributes
+	private Unhosted unhosted;
+
+	// Errors exception
 	public class DAVException extends Exception
 	{
 		public DAVException(String s)
@@ -42,8 +43,11 @@ public class DAV
 		}
 	}
 
-	private Storage localStorage;
-	private URL location;
+	// Constructor
+	public DAV(Unhosted unhosted)
+	{
+		this.unhosted = unhosted;
+	}
 
 	static private String makeBasicAuth(String user, String password)
 	{
@@ -53,13 +57,13 @@ public class DAV
 
 	private String key2Url(String key)
 	{
-		String[] userNameParts = ((String)this.localStorage.getItem("unhosted::userName")).split("@");
+		String[] userNameParts = this.unhosted.getUserName().split("@");
 
-		return this.localStorage.getItem("unhosted::davDomain")
-				+"webdav/"+userNameParts[1]
-				+"/"+userNameParts[0]
-				+"/"+this.location.getAuthority()
-				+"/"+key;
+		return this.unhosted.getDavDomain()
+							+"webdav/"+userNameParts[1]
+							+"/"+userNameParts[0]
+							+"/"+this.unhosted.getLocationAuthority()
+							+"/"+key;
 	}
 
 	public Object get(String key) throws DAVException
@@ -68,8 +72,8 @@ public class DAV
 		HttpGet http = new HttpGet(key2Url(key));
 
 		http.addHeader("Authorization",
-						makeBasicAuth((String)localStorage.getItem("unhosted::userName"),
-									(String)localStorage.getItem("OAuth2-cs::token")));
+						makeBasicAuth(this.unhosted.getUserName(),
+									this.unhosted.getOAuthToken()));
 //		http.withCredentials = "true";
 
 		// Create client and execute
@@ -121,8 +125,8 @@ public class DAV
 		HttpPut http = new HttpPut(key2Url(key));
 
 		http.addHeader("Authorization",
-						makeBasicAuth((String)localStorage.getItem("unhosted::userName"),
-									(String)localStorage.getItem("OAuth2-cs::token")));
+						makeBasicAuth(this.unhosted.getUserName(),
+									this.unhosted.getOAuthToken()));
 //		http.withCredentials("true");
 
 		// Set entity
