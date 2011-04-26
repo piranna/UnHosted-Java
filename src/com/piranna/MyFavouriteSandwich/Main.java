@@ -3,6 +3,7 @@ package com.piranna.MyFavouriteSandwich;
 import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuInflater;
@@ -10,20 +11,22 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import org.unhosted.Unhosted;
-import org.unhosted.android.Storage;
+import org.unhosted.android.*;
 import org.unhosted.DAV.DAVException;
 
 
 public class Main extends Activity
 {
+	static final int UNHOSTED_LOGIN_ID = 0;
+
 	private Unhosted unhosted;
 
 	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+    	super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.main);
 
         this.unhosted = new Unhosted("http://www.myfavouritesandwich.org/",
         							new Storage(this,
@@ -37,16 +40,29 @@ public class Main extends Activity
 
         	// User is not logged, show login dialog
         	if(userName == null)
-        	{
-        		Dialog dialog = new Dialog(this.getApplicationContext());
+        		showDialog(UNHOSTED_LOGIN_ID);
 
-        		dialog.setContentView(R.layout.login);
-        		dialog.setTitle("UnHosted login");
-        	}
 //        }while(userName == null);
 
-        this.showCurrentUser(userName);
-        this.showCurrentSandwich(loadSandwich());
+//        this.showCurrentUser(userName);
+//        this.showCurrentSandwich(loadSandwich());
+    }
+
+    protected Dialog onCreateDialog(int id, Bundle args)
+    {
+        Dialog dialog;
+        switch(id)
+        {
+        	case UNHOSTED_LOGIN_ID:
+        		dialog = new Login(this, this.unhosted);
+        		break;
+
+	        default:
+            	Log.e("onCreateDialog", "default");
+	            dialog = null;
+        }
+
+        return dialog;
     }
 
     @Override

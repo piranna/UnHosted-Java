@@ -1,7 +1,7 @@
 package org.unhosted.android;
 
-import android.app.Activity;
-//import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
 //import android.content.DialogInterface;
 //import android.content.Intent;
 import android.os.Bundle;
@@ -14,20 +14,24 @@ import org.unhosted.Unhosted;
 import com.piranna.MyFavouriteSandwich.R;
 
 
-public class Login extends Activity
+public class Login extends Dialog
 {
 	private Unhosted unhosted;
+
+	public Login(Context context, Unhosted unhosted)
+	{
+		super(context);
+		this.setTitle("UnHosted login");
+
+		this.unhosted = unhosted;
+	}
 
 	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.login);
-
-        this.unhosted = new Unhosted("http://www.myfavouritesandwich.org/",
-        							new Storage(this,
-        									"com.piranna.MyFavouriteSandwich"));
+        this.setContentView(R.layout.login);
     }
 
 
